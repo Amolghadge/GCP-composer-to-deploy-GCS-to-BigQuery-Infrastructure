@@ -108,7 +108,21 @@ jobs:
           export AIRFLOW__CORE__LOAD_EXAMPLES=False
           export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
           export AIRFLOW__CORE__UNIT_TEST_MODE=True
-          python dags/gcs_to_bigquery_dag.py
+          export AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+          python << 'EOF'
+          import sys
+          import os
+          sys.path.insert(0, os.path.join(os.getcwd(), 'dags'))
+          try:
+              from gcs_to_bigquery_dag import dag
+              print(f"✓ DAG imported successfully: {dag.dag_id}")
+              print(f"✓ DAG has {len(dag.tasks)} tasks")
+              for task in dag.tasks:
+                  print(f"  - {task.task_id}")
+          except Exception as e:
+              print(f"✗ Failed to import DAG: {e}")
+              sys.exit(1)
+          EOF
 
   terraform-apply:
     name: Terraform Apply
