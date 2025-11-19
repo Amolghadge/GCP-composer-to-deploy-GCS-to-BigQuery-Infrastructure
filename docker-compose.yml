@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  airflow:
+    build: .
+    image: gcs-to-bigquery-dag:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW_HOME=/app/airflow
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/dags
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - GCP_PROJECT_ID=your-project-id
+      - GCS_SOURCE_BUCKET=your-project-id-source
+      - GCS_ARCHIVE_BUCKET=your-project-id-archive
+      - BQ_DATASET_ID=data_warehouse
+      - BQ_STAGING_TABLE=staging_data
+      - BQ_MAIN_TABLE=main_data
+    volumes:
+      - ./dags:/app/dags
+      - ./logs:/app/airflow/logs
+      - ./terraform:/app/terraform
+    depends_on:
+      - postgres
+    command: >
+      bash -c "airflow db init &&
+               airflow users create --role Admin --username admin --email admin@example.com --firstname admin --lastname user --password admin || true &&
+               airflow webserver -p 8080"
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=airflow
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,12 @@
+project_id             = "ornate-producer-477604-s3"
+region                 = "us-central1"
+composer_env_name      = "gcs-to-bq-composer"
+machine_type           = "n1-standard-4"
+node_count             = 1
+python_version         = "3"
+airflow_version        = "2"
+gcs_source_bucket      = "gcs-bucket-to-bq-source"
+gcs_archive_bucket     = "gcs-bucket-to-bq-archive"
+bigquery_dataset       = "data_warehouse"
+bigquery_staging_table = "staging_data"
+bigquery_main_table    = "main_data"
