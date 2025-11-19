@@ -93,7 +93,7 @@ jobs:
 
       - name: Install Airflow
         run: |
-          pip install --upgrade pip
+          pip install --upgrade pip setuptools wheel
           pip install apache-airflow==2.7.0
           pip install apache-airflow-providers-google>=10.0.0
 
@@ -101,11 +101,20 @@ jobs:
         run: |
           python -m py_compile dags/gcs_to_bigquery_dag.py
 
+      - name: Initialize Airflow Database
+        run: |
+          export AIRFLOW_HOME=$(pwd)
+          export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
+          export AIRFLOW__CORE__LOAD_EXAMPLES=False
+          export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
+          airflow db init
+
       - name: Check DAG Structure
         run: |
           export AIRFLOW_HOME=$(pwd)
           export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
           export AIRFLOW__CORE__LOAD_EXAMPLES=False
+          export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
           python dags/gcs_to_bigquery_dag.py
 
   terraform-apply:
