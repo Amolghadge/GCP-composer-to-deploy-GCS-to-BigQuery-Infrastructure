@@ -107,7 +107,7 @@ jobs:
           export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
           export AIRFLOW__CORE__LOAD_EXAMPLES=False
           export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
-          airflow db init
+          python -m airflow db init
 
       - name: Check DAG Structure
         run: |

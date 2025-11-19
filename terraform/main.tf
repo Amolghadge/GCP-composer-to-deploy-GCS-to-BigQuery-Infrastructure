@@ -137,9 +137,9 @@ resource "google_composer_environment" "gcs_to_bq" {
 
     software_config {
       airflow_config_overrides = {
-        "core-load_examples"         = "False"
-        "logging-logging_level"      = "INFO"
-        "webserver-expose_config"    = "True"
+        "core-load_examples"      = "False"
+        "logging-logging_level"   = "INFO"
+        "webserver-expose_config" = "True"
       }
 
       pypi_packages = {
@@ -149,12 +149,12 @@ resource "google_composer_environment" "gcs_to_bq" {
       }
 
       env_variables = {
-        GCS_SOURCE_BUCKET    = google_storage_bucket.source_bucket.name
-        GCS_ARCHIVE_BUCKET   = google_storage_bucket.archive_bucket.name
-        BQ_DATASET_ID        = google_bigquery_dataset.data_warehouse.dataset_id
-        BQ_STAGING_TABLE     = google_bigquery_table.staging_table.table_id
-        BQ_MAIN_TABLE        = google_bigquery_table.main_table.table_id
-        GCP_PROJECT_ID       = var.project_id
+        GCS_SOURCE_BUCKET  = google_storage_bucket.source_bucket.name
+        GCS_ARCHIVE_BUCKET = google_storage_bucket.archive_bucket.name
+        BQ_DATASET_ID      = google_bigquery_dataset.data_warehouse.dataset_id
+        BQ_STAGING_TABLE   = google_bigquery_table.staging_table.table_id
+        BQ_MAIN_TABLE      = google_bigquery_table.main_table.table_id
+        GCP_PROJECT_ID     = var.project_id
       }
     }
   }
