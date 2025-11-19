@@ -102,9 +102,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
           pip install pytest pytest-cov
+
+      - name: Initialize Airflow database
+        run: |
+          export AIRFLOW_HOME=$(pwd)
+          export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
+          export AIRFLOW__CORE__LOAD_EXAMPLES=False
+          export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
+          airflow db init
 
       - name: Create test directory
         run: mkdir -p tests
@@ -116,15 +124,13 @@ jobs:
           import os
           sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 
-          from airflow import DAG
-          from datetime import datetime
-
           def test_dag_import():
               """Test that DAG can be imported without errors"""
-              # Set up minimal Airflow environment
+              # Set up Airflow environment
               os.environ['AIRFLOW_HOME'] = os.path.dirname(__file__)
               os.environ['AIRFLOW__CORE__DAGS_FOLDER'] = os.path.join(os.path.dirname(__file__), '../dags')
               os.environ['AIRFLOW__CORE__LOAD_EXAMPLES'] = 'False'
+              os.environ['AIRFLOW__DATABASE__SQL_ALCHEMY_CONN'] = 'sqlite:////tmp/airflow.db'
               
               from dags.gcs_to_bigquery_dag import dag
               assert dag is not None
@@ -135,6 +141,7 @@ jobs:
               os.environ['AIRFLOW_HOME'] = os.path.dirname(__file__)
               os.environ['AIRFLOW__CORE__DAGS_FOLDER'] = os.path.join(os.path.dirname(__file__), '../dags')
               os.environ['AIRFLOW__CORE__LOAD_EXAMPLES'] = 'False'
+              os.environ['AIRFLOW__DATABASE__SQL_ALCHEMY_CONN'] = 'sqlite:////tmp/airflow.db'
               
               from dags.gcs_to_bigquery_dag import dag
               
@@ -156,6 +163,7 @@ jobs:
               os.environ['AIRFLOW_HOME'] = os.path.dirname(__file__)
               os.environ['AIRFLOW__CORE__DAGS_FOLDER'] = os.path.join(os.path.dirname(__file__), '../dags')
               os.environ['AIRFLOW__CORE__LOAD_EXAMPLES'] = 'False'
+              os.environ['AIRFLOW__DATABASE__SQL_ALCHEMY_CONN'] = 'sqlite:////tmp/airflow.db'
               
               from dags.gcs_to_bigquery_dag import dag
               
@@ -169,6 +177,7 @@ jobs:
           export AIRFLOW_HOME=$(pwd)
           export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
           export AIRFLOW__CORE__LOAD_EXAMPLES=False
+          export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
           pytest tests/ -v --cov=dags
 
   docker-build:
