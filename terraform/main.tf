@@ -72,6 +72,8 @@ resource "google_bigquery_table" "staging_table" {
   labels = var.environment_labels
 }
 
+
+
 # BigQuery Main Table
 resource "google_bigquery_table" "main_table" {
   dataset_id = google_bigquery_dataset.data_warehouse.dataset_id
