@@ -176,6 +176,23 @@ resource "google_service_account" "composer_sa" {
 }
 
 # IAM Roles for Cloud Composer Service Account
+# NOTE: These roles require the terraform service account to have 
+# roles/resourcemanager.projectIamAdmin permission. If you get 
+# "Policy update access denied" errors, comment these out and assign
+# roles manually via gcloud or GCP console:
+#
+# gcloud projects add-iam-policy-binding PROJECT_ID \
+#   --member=serviceAccount:cloud-composer-sa@PROJECT_ID.iam.gserviceaccount.com \
+#   --role=roles/composer.worker
+#
+# gcloud projects add-iam-policy-binding PROJECT_ID \
+#   --member=serviceAccount:cloud-composer-sa@PROJECT_ID.iam.gserviceaccount.com \
+#   --role=roles/bigquery.admin
+#
+# gcloud projects add-iam-policy-binding PROJECT_ID \
+#   --member=serviceAccount:cloud-composer-sa@PROJECT_ID.iam.gserviceaccount.com \
+#   --role=roles/storage.admin
+
 resource "google_project_iam_member" "composer_worker" {
   project = var.project_id
   role    = "roles/composer.worker"
