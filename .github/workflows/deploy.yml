@@ -101,6 +101,22 @@ jobs:
         run: |
           python -m py_compile dags/gcs_to_bigquery_dag.py
 
+      - name: Initialize Airflow
+        run: |
+          export AIRFLOW_HOME=$(pwd)
+          export AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/dags
+          export AIRFLOW__CORE__LOAD_EXAMPLES=False
+          export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////tmp/airflow.db
+          python << 'EOF'
+          import subprocess
+          import sys
+          result = subprocess.run([sys.executable, '-m', 'airflow', 'db', 'init'], 
+                                capture_output=True, text=True)
+          if result.returncode != 0 and 'already initialized' not in result.stderr.lower():
+              print(f"Warning: {result.stderr}")
+          print("✓ Airflow initialized")
+          EOF
+
       - name: Check DAG Structure
         run: |
           export AIRFLOW_HOME=$(pwd)
@@ -112,7 +128,9 @@ jobs:
           python << 'EOF'
           import sys
           import os
+          
           sys.path.insert(0, os.path.join(os.getcwd(), 'dags'))
+          
           try:
               from gcs_to_bigquery_dag import dag
               print(f"✓ DAG imported successfully: {dag.dag_id}")
@@ -121,6 +139,8 @@ jobs:
                   print(f"  - {task.task_id}")
           except Exception as e:
               print(f"✗ Failed to import DAG: {e}")
+              import traceback
+              traceback.print_exc()
               sys.exit(1)
           EOF
 
